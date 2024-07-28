@@ -3,8 +3,6 @@ name: Machine Learning CI/CD Pipeline
 on:
   push:
     branches: [development, main, stage]
-  pull_request:
-    branches: [development, main, stage]
 
 jobs:
   lint:
