@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from imblearn.over_sampling import SMOTE
 from collections import Counter
@@ -13,6 +13,12 @@ import mlflow.sklearn
 
 # Setting up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
+file_handler = logging.FileHandler('model_training.log')
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 def import_data(filepath):
     """
@@ -85,30 +91,25 @@ def scale_features(X):
         logging.error("Error in scaling features: %s", e)
         raise
 
-def train_logistic_regression(X, y, penalty, C):
+def train_logistic_regression(X, y, param_grid):
     """
-    Trains a logistic regression model.
+    Performs hyperparameter tuning using GridSearchCV and trains a logistic regression model.
     Args:
         X (DataFrame): Input features for training.
         y (Series): Target labels for training.
-        penalty (str): Penalty type ('l1' or 'l2').
-        C (float): Inverse of regularization strength.
+        param_grid (dict): Dictionary with parameters names (`str`) as keys and lists of parameter settings to try as values.
     Returns:
-        LogisticRegression: The trained logistic regression model.
+        tuple: Best logistic regression model and best parameters.
     """
     try:
-        model = LogisticRegression(
-            penalty=penalty,
-            C=C,
-            random_state=42,
-            max_iter=10000,
-            solver="liblinear",
-        )
-        model.fit(X, y)
-        logging.info("Model trained with penalty=%s, C=%s", penalty, C)
-        return model
+        model = LogisticRegression(random_state=42, max_iter=10000, solver="liblinear")
+        grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+        grid_search.fit(X, y)
+        logging.info("Best parameters found: %s", grid_search.best_params_)
+        logging.info("Best cross-validation accuracy: %s", grid_search.best_score_)
+        return grid_search.best_estimator_, grid_search.best_params_
     except Exception as e:
-        logging.error("Error in training model: %s", e)
+        logging.error("Error in hyperparameter tuning: %s", e)
         raise
 
 def save_model(model, filename):
@@ -162,20 +163,19 @@ def main():
         X_scaled, y_resampled, test_size=0.20, random_state=42
     )
 
-    penalties = ["l1", "l2"]
-    C_values = [1, 0.5, 0.1]
+    param_grid = {
+        'penalty': ['l1', 'l2'],
+        'C': [1, 0.5, 0.1, 0.01, 0.001]
+    }
 
-    for penalty in penalties:
-        for C in C_values:
-            with mlflow.start_run():
-                model = train_logistic_regression(X_train, y_train, penalty, C)
-                acc_score = evaluate_model(model, X_test, y_test)
-                mlflow.log_param("penalty", penalty)
-                mlflow.log_param("C", C)
-                mlflow.log_metric("accuracy", acc_score)
-                mlflow.log_artifact("data/water_potability.csv")
+    with mlflow.start_run():
+        best_model, best_params = train_logistic_regression(X_train, y_train, param_grid)
+        acc_score = evaluate_model(best_model, X_test, y_test)
+        mlflow.log_params(best_params)
+        mlflow.log_metric("accuracy", acc_score)
+        mlflow.log_artifact("data/water_potability.csv")
 
-    save_model(model, "model/water_potability_model.pkl")
+    save_model(best_model, "model/water_potability_model.pkl")
 
 if __name__ == "__main__":
     main()
