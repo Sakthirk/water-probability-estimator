@@ -1,0 +1,10 @@
+digest: f3ddf107
+name: dataset
+profile: '{"features_shape": [1278, 9], "features_size": 11502, "features_nbytes":
+  92016}'
+schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
+  {\"dtype\": \"float64\", \"shape\": [-1, 9]}}]", "targets": null}}'
+source: '{"tags": {"mlflow.user": "Z0012020", "mlflow.source.name": "c:/Users/Z0012020/OneDrive
+  - ZF Friedrichshafen AG/Documents/GitHub/Water-probability-estimator 1/water-probability-estimator/src/train.py",
+  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "7ba82a66d8bffb93c1289d787edb3d0e7ee3c8b4"}}'
+source_type: code

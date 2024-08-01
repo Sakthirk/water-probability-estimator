@@ -2,12 +2,23 @@ import os
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from imblearn.over_sampling import SMOTE
 from collections import Counter
 import pickle
+import logging
+import mlflow
+import mlflow.sklearn
 
+# Setting up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
+file_handler = logging.FileHandler('model_training.log')
+file_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 def import_data(filepath):
     """
@@ -17,8 +28,13 @@ def import_data(filepath):
     Returns:
         DataFrame: Pandas DataFrame containing the imported data.
     """
-    return pd.read_csv(filepath)
-
+    try:
+        data = pd.read_csv(filepath)
+        logging.info("Data imported successfully from %s", filepath)
+        return data
+    except Exception as e:
+        logging.error("Error importing data: %s", e)
+        raise
 
 def preprocess_data(data):
     """
@@ -28,12 +44,16 @@ def preprocess_data(data):
     Returns:
         DataFrame: The preprocessed pandas DataFrame.
     """
-    for column in ["ph", "Sulfate", "Trihalomethanes"]:
-        data[column] = data[column].fillna(
-            data.groupby(["Potability"])[column].transform("mean")
-        )
-    return data
-
+    try:
+        for column in ["ph", "Sulfate", "Trihalomethanes"]:
+            data[column] = data[column].fillna(
+                data.groupby(["Potability"])[column].transform("mean")
+            )
+        logging.info("Data preprocessing completed")
+        return data
+    except Exception as e:
+        logging.error("Error in data preprocessing: %s", e)
+        raise
 
 def balance_data(X, y):
     """
@@ -44,13 +64,15 @@ def balance_data(X, y):
     Returns:
         tuple: The resampled features and target datasets.
     """
-    print("Balancing the data by SMOTE - Oversampling of Minority level")
-    smt = SMOTE()
-    print("Before SMOTE", Counter(y))
-    X_res, y_res = smt.fit_resample(X, y)
-    print("After SMOTE", Counter(y_res))
-    return X_res, y_res
-
+    try:
+        smt = SMOTE()
+        logging.info("Before SMOTE: %s", Counter(y))
+        X_res, y_res = smt.fit_resample(X, y)
+        logging.info("After SMOTE: %s", Counter(y_res))
+        return X_res, y_res
+    except Exception as e:
+        logging.error("Error in balancing data: %s", e)
+        raise
 
 def scale_features(X):
     """
@@ -60,47 +82,35 @@ def scale_features(X):
     Returns:
         tuple: Scaled dataset and the scaler object used.
     """
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    return X_scaled, scaler
+    try:
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        logging.info("Feature scaling completed")
+        return X_scaled, scaler
+    except Exception as e:
+        logging.error("Error in scaling features: %s", e)
+        raise
 
-
-def train_logistic_regression(X, y):
+def train_logistic_regression(X, y, param_grid):
     """
-    Trains a logistic regression model by iterating over combinations of penalties and C values to find the best model.
+    Performs hyperparameter tuning using GridSearchCV and trains a logistic regression model.
     Args:
         X (DataFrame): Input features for training.
         y (Series): Target labels for training.
+        param_grid (dict): Dictionary with parameters names (`str`) as keys and lists of parameter settings to try as values.
     Returns:
-        tuple: Best logistic regression model, penalty, C value, and accuracy.
+        tuple: Best logistic regression model and best parameters.
     """
-    C_values = [1, 0.5, 0.1, 0.003, 0.01]
-    best_model = None
-    best_accuracy = 0
-    best_penalty = ""
-    best_C = 0
-    for penalty in ["l1", "l2"]:
-        for C in C_values:
-            model = LogisticRegression(
-                penalty=penalty,
-                C=C,
-                random_state=42,
-                max_iter=10000,
-                solver="liblinear",
-            )
-            model.fit(X, y)
-            accuracy = accuracy_score(y, model.predict(X))
-            print(f"Penalty: {penalty}, C: {C}, Training Accuracy: {accuracy}")
-            if accuracy > best_accuracy:
-                best_accuracy = accuracy
-                best_penalty = penalty
-                best_C = C
-                best_model = model
-    print(
-        f"Best Penalty: {best_penalty}, Best C: {best_C}, Best Training Accuracy: {best_accuracy}"
-    )
-    return best_model, best_penalty, best_C, best_accuracy
-
+    try:
+        model = LogisticRegression(random_state=42, max_iter=10000, solver="liblinear")
+        grid_search = GridSearchCV(model, param_grid, cv=5, scoring='accuracy')
+        grid_search.fit(X, y)
+        logging.info("Best parameters found: %s", grid_search.best_params_)
+        logging.info("Best cross-validation accuracy: %s", grid_search.best_score_)
+        return grid_search.best_estimator_, grid_search.best_params_
+    except Exception as e:
+        logging.error("Error in hyperparameter tuning: %s", e)
+        raise
 
 def save_model(model, filename):
     """
@@ -109,11 +119,15 @@ def save_model(model, filename):
         model (LogisticRegression): The logistic regression model to save.
         filename (str): The filename to save the model to.
     """
-    dir_name = filename.split("/")[0]
-    os.makedirs(dir_name, exist_ok=True)
-    with open(filename, "wb") as file:
-        pickle.dump(model, file)
-
+    try:
+        dir_name = filename.split("/")[0]
+        os.makedirs(dir_name, exist_ok=True)
+        with open(filename, "wb") as file:
+            pickle.dump(model, file)
+        logging.info("Model saved to %s", filename)
+    except Exception as e:
+        logging.error("Error saving model: %s", e)
+        raise
 
 def evaluate_model(model, X_test, y_test):
     """
@@ -123,16 +137,22 @@ def evaluate_model(model, X_test, y_test):
         X_test (DataFrame): Test features dataset.
         y_test (Series): Test target dataset.
     """
-    y_pred = model.predict(X_test)
-    acc_score = accuracy_score(y_test, y_pred)
-    print(f"Test Accuracy: {acc_score}")
-    print(classification_report(y_test, y_pred))
-
+    try:
+        y_pred = model.predict(X_test)
+        acc_score = accuracy_score(y_test, y_pred)
+        logging.info("Test Accuracy: %s", acc_score)
+        logging.info("\n%s", classification_report(y_test, y_pred))
+        return acc_score
+    except Exception as e:
+        logging.error("Error evaluating model: %s", e)
+        raise
 
 def main():
     """
     Main function to run the model training and evaluation pipeline.
     """
+    mlflow.sklearn.autolog()  # Enable autologging for sklearn
+
     data = import_data("data/water_potability.csv")
     data = preprocess_data(data)
     X = data.drop("Potability", axis=1)
@@ -140,12 +160,22 @@ def main():
     X_resampled, y_resampled = balance_data(X, y)
     X_scaled, scaler = scale_features(X_resampled)
     X_train, X_test, y_train, y_test = train_test_split(
-        X_scaled, y_resampled, test_size=0.20
+        X_scaled, y_resampled, test_size=0.20, random_state=42
     )
-    model, _, _, _ = train_logistic_regression(X_train, y_train)
-    evaluate_model(model, X_test, y_test)
-    save_model(model, "model/water_potability_model.pkl")
 
+    param_grid = {
+        'penalty': ['l1', 'l2'],
+        'C': [1, 0.5, 0.1, 0.01, 0.001]
+    }
+
+    with mlflow.start_run():
+        best_model, best_params = train_logistic_regression(X_train, y_train, param_grid)
+        acc_score = evaluate_model(best_model, X_test, y_test)
+        mlflow.log_params(best_params)
+        mlflow.log_metric("accuracy", acc_score)
+        mlflow.log_artifact("data/water_potability.csv")
+
+    save_model(best_model, "model/water_potability_model.pkl")
 
 if __name__ == "__main__":
     main()
