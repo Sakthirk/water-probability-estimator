@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Z0012020/OneDrive%20-%20ZF%20Friedrichshafen%20AG/Documents/GitHub/Water-probability-estimator%201/water-probability-estimator/mlruns/0/9d9cdb9ffae24a66aad0a51aa305a49b/artifacts
+end_time: 1722404594026
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 9d9cdb9ffae24a66aad0a51aa305a49b
+run_name: clean-crab-768
+run_uuid: 9d9cdb9ffae24a66aad0a51aa305a49b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722404575043
+status: 3
+tags: []
+user_id: Z0012020
