@@ -12,4 +12,4 @@ RUN pip3 install --no-cache-dir -r app/requirements.txt
 EXPOSE 5000
 
 # Run app.py when the container launches
-CMD ["python", "app/controller.py"]
+CMD ["python", "-u", "app/controller.py"]

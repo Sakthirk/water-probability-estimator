@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Template for deploying model on ECS
+
+Resources:
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: "water-probability-estimator-repo"
+      ImageScanningConfiguration:
+        ScanOnPush: true
+      EncryptionConfiguration:
+        EncryptionType: AES256
+      ImageTagMutability: MUTABLE
+
+  ECSCluster:
+    Type: "AWS::ECS::Cluster"
+    Properties:
+      ClusterName: "water-probability-estimator-cluster"
+
+  EcsTaskExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "water-probability-estimator-role"
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+
+  EcsContainerLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Sub "/fargate/task/water-probability-estimator"
+      RetentionInDays: 7
+
+  EcsTaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: "water-probability-estimator"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: 1024
+      Memory: 2GB
+      ExecutionRoleArn: !GetAtt "EcsTaskExecutionRole.Arn"
+      TaskRoleArn: !Ref EcsTaskExecutionRole
+      ContainerDefinitions:
+        - Name: "water-probability-estimator"
+          Image: !Join
+            - ":"
+            - [!GetAtt EcrRepository.RepositoryUri, "latest"]
+          PortMappings:
+            - ContainerPort: 5000
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: !Ref AWS::Region
+              awslogs-group: !Ref EcsContainerLogGroup
+              awslogs-stream-prefix: "ecs"
+
+  ECSContainerSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: ECS Container Security Group
+      GroupName: !Sub "water-probability-estimator-sg"
+      VpcId: "vpc-0d7ddabe65f87c011"
+
+  ECSService:
+    Type: "AWS::ECS::Service"
+    Properties:
+      ServiceName: "water-probability-estimator-service"
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref EcsTaskDefinition
+      DeploymentConfiguration:
+        MinimumHealthyPercent: 100
+        MaximumPercent: 200
+      DesiredCount: 0
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - subnet-0735a9645eb55d557
+            - subnet-0a9d22666b360c3f2
+          SecurityGroups:
+            - !Ref ECSContainerSecurityGroup
