@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/3a1848b1c1a7444fa38b391f0b78fb28/artifacts
+end_time: 1722778485525
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 3a1848b1c1a7444fa38b391f0b78fb28
+run_name: fortunate-worm-937
+run_uuid: 3a1848b1c1a7444fa38b391f0b78fb28
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778484296
+status: 3
+tags: []
+user_id: vishal

@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/b5869fa5c450436a84734adc9fa29c23/artifacts
+end_time: 1722778488044
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: b5869fa5c450436a84734adc9fa29c23
+run_name: calm-shrew-375
+run_uuid: b5869fa5c450436a84734adc9fa29c23
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778485534
+status: 3
+tags: []
+user_id: vishal

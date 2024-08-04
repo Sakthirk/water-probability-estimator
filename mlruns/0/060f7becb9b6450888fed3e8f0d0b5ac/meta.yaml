@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/060f7becb9b6450888fed3e8f0d0b5ac/artifacts
+end_time: 1722778438755
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 060f7becb9b6450888fed3e8f0d0b5ac
+run_name: adorable-squid-156
+run_uuid: 060f7becb9b6450888fed3e8f0d0b5ac
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778436239
+status: 3
+tags: []
+user_id: vishal
