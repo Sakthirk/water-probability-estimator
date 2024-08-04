@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/2d8bc432f5bf497f81dfdd0e22364c32/artifacts
+end_time: 1722778438700
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 2d8bc432f5bf497f81dfdd0e22364c32
+run_name: debonair-calf-233
+run_uuid: 2d8bc432f5bf497f81dfdd0e22364c32
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778436239
+status: 3
+tags: []
+user_id: vishal

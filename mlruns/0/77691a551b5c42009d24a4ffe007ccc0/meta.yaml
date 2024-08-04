@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/77691a551b5c42009d24a4ffe007ccc0/artifacts
+end_time: 1722778488123
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 77691a551b5c42009d24a4ffe007ccc0
+run_name: thundering-trout-209
+run_uuid: 77691a551b5c42009d24a4ffe007ccc0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778485534
+status: 3
+tags: []
+user_id: vishal

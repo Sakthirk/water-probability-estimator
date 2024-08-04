@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/abfe2e1627124b5991db86e4f7b01a56/artifacts
+end_time: 1722778436231
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: abfe2e1627124b5991db86e4f7b01a56
+run_name: caring-steed-824
+run_uuid: abfe2e1627124b5991db86e4f7b01a56
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778435068
+status: 3
+tags: []
+user_id: vishal

@@ -1,0 +1,15 @@
+artifact_uri: mlruns/0/aaf8db98c6e14a958859286d38c4a595/artifacts
+end_time: 1722778488044
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: aaf8db98c6e14a958859286d38c4a595
+run_name: sincere-moth-484
+run_uuid: aaf8db98c6e14a958859286d38c4a595
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722778485534
+status: 3
+tags: []
+user_id: vishal
