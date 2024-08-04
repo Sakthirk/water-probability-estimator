@@ -2,7 +2,7 @@ name: Machine Learning CI/CD Pipeline
 
 on:
   push:
-    branches: [development, main, stage, feature/initial]
+    branches: [development, main, stage]
 
 jobs:
   lint:
