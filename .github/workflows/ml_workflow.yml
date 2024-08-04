@@ -84,14 +84,14 @@ jobs:
         with:
           python-version: "3.10"
 
-      # - name: Install dependencies
-      #   run: |
-      #     python -m pip install --upgrade pip
-      #     pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      # - name: Build Model
-      #   run: |
-      #     python src/train.py
+      - name: Build Model
+        run: |
+          python src/train.py
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v2
