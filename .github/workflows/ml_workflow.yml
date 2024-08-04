@@ -2,7 +2,7 @@ name: Machine Learning CI/CD Pipeline
 
 on:
   push:
-    branches: [development, main, stage]
+    branches: [development, main, stage, feature/initial]
 
 jobs:
   lint:
@@ -70,3 +70,46 @@ jobs:
         run: |
           python src/train.py
           python tests/test_model.py
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: AWS dev
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build Model
+        run: |
+          python src/train.py
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "us-east-1"
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Verify AWS CLI Installation
+        run: aws --version
+
+      - name: Publish ECR
+        run: sh M4_AWS_ECS/push_ecr.sh
+
+      - name: Deploy ECS Service
+        run: sh M4_AWS_ECS/cft_deploy.sh

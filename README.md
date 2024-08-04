@@ -52,3 +52,21 @@ python tests/test_model.py
 pip3 install -r requirements.txt
 python src/train.py
 ```
+
+# M4 Deployed endpoint
+
+```
+curl --location 'http://ec2-3-236-192-59.compute-1.amazonaws.com:8080/predict' \
+--header 'Content-Type: application/json' \
+--data '{
+    "ph": 7.0,
+    "Hardness": 150,
+    "Solids": 15000,
+    "Chloramines": 7,
+    "Sulfate": 250,
+    "Conductivity": 400,
+    "Organic_carbon": 15,
+    "Trihalomethanes": 70,
+    "Turbidity": 3.5
+}'
+```
