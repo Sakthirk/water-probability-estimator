@@ -1,0 +1,15 @@
+artifact_uri: mlruns/a1c4f55a3b614ec393393c08a790d0f7/artifacts
+end_time: 1722777763992
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a1c4f55a3b614ec393393c08a790d0f7
+run_name: grandiose-dolphin-90
+run_uuid: a1c4f55a3b614ec393393c08a790d0f7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1722777761088
+status: 3
+tags: []
+user_id: vishal
