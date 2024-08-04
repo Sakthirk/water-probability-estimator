@@ -56,7 +56,7 @@ Resources:
             - ":"
             - [!GetAtt EcrRepository.RepositoryUri, "latest"]
           PortMappings:
-            - ContainerPort: 5000
+            - ContainerPort: 8080
           LogConfiguration:
             LogDriver: awslogs
             Options:
@@ -80,7 +80,7 @@ Resources:
       DeploymentConfiguration:
         MinimumHealthyPercent: 100
         MaximumPercent: 200
-      DesiredCount: 0
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:

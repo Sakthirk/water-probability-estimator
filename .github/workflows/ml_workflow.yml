@@ -110,3 +110,6 @@ jobs:
 
       - name: Publish ECR
         run: sh M4_AWS_ECS/push_ecr.sh
+
+      - name: Deploy ECS Service
+        run: sh M4_AWS_ECS/cft_deploy.sh
