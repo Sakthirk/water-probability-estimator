@@ -151,6 +151,8 @@ def main():
     """
     Main function to run the model training and evaluation pipeline.
     """
+    mlflow.set_experiment("Water Potability Prediction")
+    
     mlflow.sklearn.autolog()  # Enable autologging for sklearn
 
     data = import_data("data/water_potability.csv")
